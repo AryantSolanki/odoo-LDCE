@@ -16,7 +16,7 @@ class City(Base):
     description = Column(Text, nullable=True)
     avg_daily_cost = Column(Float, default=100.0, nullable=False)
     avg_meal_cost = Column(Float, default=25.0, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc), nullable=False)
 
     activities = relationship("Activity", back_populates="city", cascade="all, delete-orphan")
     stops = relationship("TripStop", back_populates="city")

@@ -16,7 +16,7 @@ class Activity(Base):
     duration_hours = Column(Float, default=2.0, nullable=False)
     rating = Column(Float, default=4.5, nullable=False)
     image_url = Column(String(512), nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc), nullable=False)
 
     city = relationship("City", back_populates="activities")
     trip_activities = relationship("TripActivity", back_populates="activity")

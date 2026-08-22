@@ -15,7 +15,7 @@ class TripActivity(Base):
     date = Column(Date, nullable=False)
     notes = Column(Text, nullable=True)
     is_completed = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc), nullable=False)
 
     stop = relationship("TripStop", back_populates="trip_activities")
     activity = relationship("Activity", back_populates="trip_activities")

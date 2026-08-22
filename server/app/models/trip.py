@@ -21,11 +21,11 @@ class Trip(Base):
     budget_limit = Column(Float, default=0.0, nullable=False)
     is_public = Column(Boolean, default=False, nullable=False)
     public_id = Column(String(64), unique=True, index=True, default=generate_uuid, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc), nullable=False)
     updated_at = Column(
         DateTime,
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
+        onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
         nullable=False
     )
 

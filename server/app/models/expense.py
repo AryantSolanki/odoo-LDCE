@@ -13,6 +13,6 @@ class Expense(Base):
     amount = Column(Float, default=0.0, nullable=False)
     date = Column(Date, nullable=False)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc), nullable=False)
 
     trip = relationship("Trip", back_populates="expenses")
