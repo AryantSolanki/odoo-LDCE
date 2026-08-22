@@ -28,7 +28,7 @@ import { apiService } from '../services/apiService';
 import { useToast } from '../hooks/useToast';
 
 export const ExplorePage = () => {
-  const [activeTab, setActiveTab] = useState('cities'); // 'cities' | 'activities'
+  const [activeTab, setActiveTab] = useState('cities');
   const [cities, setCities] = useState([]);
   const [activities, setActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,8 +41,6 @@ export const ExplorePage = () => {
   const [sortBy, setSortBy] = useState('popular');
   const [savedCityIds, setSavedCityIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
-
-  // Selected city for "Add to Trip" modal
   const [selectedCityForTrip, setSelectedCityForTrip] = useState(null);
   const [isAddCityOpen, setIsAddCityOpen] = useState(false);
 
@@ -77,11 +75,9 @@ export const ExplorePage = () => {
       if (activityCostFilter === 'free') maxCost = 0;
       else if (activityCostFilter === 'under25') maxCost = 25;
       else if (activityCostFilter === 'under50') maxCost = 50;
-
       let maxDuration = null;
       if (activityDurationFilter === 'short') maxDuration = 2;
       else if (activityDurationFilter === 'halfDay') maxDuration = 4;
-
       const data = await apiService.searchActivities({
         q: searchQuery,
         category: activityCategoryFilter,
@@ -97,21 +93,12 @@ export const ExplorePage = () => {
   };
 
   useEffect(() => {
-    if (activeTab === 'cities') {
-      fetchCities();
-    } else {
-      fetchActivities();
-    }
+    if (activeTab === 'cities') fetchCities();
+    else fetchActivities();
   }, [
-    activeTab,
-    searchQuery,
-    regionFilter,
-    costIndexFilter,
-    categoryFilter,
-    activityCategoryFilter,
-    activityCostFilter,
-    activityDurationFilter,
-    sortBy,
+    activeTab, searchQuery, regionFilter, costIndexFilter,
+    categoryFilter, activityCategoryFilter, activityCostFilter,
+    activityDurationFilter, sortBy,
   ]);
 
   const handleToggleBookmark = async (city, e) => {
@@ -124,7 +111,6 @@ export const ExplorePage = () => {
         else next.delete(Number(city.id));
         return next;
       });
-
       addToast({
         type: saved ? 'success' : 'info',
         title: saved ? 'City Saved' : 'Removed from Saved',
@@ -156,410 +142,339 @@ export const ExplorePage = () => {
 
   return (
     <AppShell>
-      <div className="space-y-6 animate-fade-in pb-12">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <Compass className="w-6 h-6 text-travel-500" />
-              <span>Explore Destinations & Activities</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Discover ideal cities, cost benchmarks, and curated local activities for your next journey.
-            </p>
-          </div>
-
-          {/* Mode Switcher Tabs */}
-          <div className="flex items-center p-1 bg-slate-200/70 rounded-2xl shrink-0 w-fit">
-            <button
-              onClick={() => setActiveTab('cities')}
-              className={`px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                activeTab === 'cities'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Cities ({cities.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('activities')}
-              className={`px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                activeTab === 'activities'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Activities & Tours
-            </button>
+      <div className="space-y-12 pb-24 -mt-6 sm:-mt-8">
+        
+        {/* Massive Immersive Hero Section */}
+        <div className="relative w-full h-[60vh] min-h-[500px] rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden shadow-card isolate">
+          <img 
+            src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1920&q=80" 
+            alt="Paris Architecture"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-brand-950/20 to-transparent" />
+          
+          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="max-w-2xl">
+              <span className="inline-block px-4 py-1.5 mb-4 rounded-full bg-surface-card/20 backdrop-blur-md text-brand-50 text-xs font-bold tracking-widest uppercase border border-white/20">
+                Inspiration
+              </span>
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-editorial font-bold text-white leading-[1.1] tracking-tight mb-4 text-balance">
+                JOURNEYS WORTH REMEMBERING.
+              </h1>
+              <p className="text-brand-100 text-lg md:text-xl font-medium max-w-lg">
+                Discover curated destinations, budget intelligently, and plan the perfect multi-city escape.
+              </p>
+            </div>
+            
+            <div className="flex gap-4 shrink-0">
+              <button 
+                onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}
+                className="px-8 py-4 rounded-full bg-brand-50 text-brand-900 font-bold hover:bg-white transition-colors"
+              >
+                Explore Destinations
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Compact Search & Filter Toolbar */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-subtle space-y-3">
-          {activeTab === 'cities' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-              {/* Search input */}
-              <div className="md:col-span-2">
-                <Input
-                  type="search"
-                  placeholder="Search city, country, or description..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  leftIcon={<Search className="w-4 h-4 text-slate-400" />}
-                />
-              </div>
-
-              {/* Region Filter */}
-              <div>
-                <Select
-                  value={regionFilter}
-                  onChange={(e) => setRegionFilter(e.target.value)}
-                  options={[
-                    { label: 'All Regions', value: 'all' },
-                    { label: 'Europe', value: 'Europe' },
-                    { label: 'Asia', value: 'Asia' },
-                    { label: 'North America', value: 'North America' },
-                    { label: 'Oceania', value: 'Oceania' },
-                  ]}
-                />
-              </div>
-
-              {/* Cost Index Filter */}
-              <div>
-                <Select
-                  value={costIndexFilter}
-                  onChange={(e) => setCostIndexFilter(e.target.value)}
-                  options={[
-                    { label: 'All Budgets', value: 'all' },
-                    { label: 'Budget ($)', value: 'Budget' },
-                    { label: 'Moderate ($$)', value: 'Moderate' },
-                    { label: 'Luxury ($$$)', value: 'Luxury' },
-                  ]}
-                />
-              </div>
-
-              {/* Sort Filter */}
-              <div>
-                <Select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  options={[
-                    { label: 'Most Popular', value: 'popular' },
-                    { label: 'Rating (High-Low)', value: 'rating' },
-                    { label: 'Cost (Low to High)', value: 'cost_asc' },
-                    { label: 'Cost (High to Low)', value: 'cost_desc' },
-                    { label: 'Alphabetical', value: 'name' },
-                  ]}
-                />
-              </div>
+        {/* Search & Filter Floating Bar */}
+        <div className="relative max-w-5xl mx-auto -mt-20 z-10">
+          <div className="bg-surface-card rounded-[2rem] p-6 shadow-modal border border-surface-border">
+            
+            {/* Tabs */}
+            <div className="flex items-center gap-6 border-b border-surface-border pb-4 mb-6">
+              <button
+                onClick={() => setActiveTab('cities')}
+                className={`text-lg font-editorial font-bold transition-all relative ${
+                  activeTab === 'cities' ? 'text-brand-900' : 'text-brand-400 hover:text-brand-600'
+                }`}
+              >
+                Discover Cities
+                {activeTab === 'cities' && <span className="absolute -bottom-4 left-0 right-0 h-0.5 bg-brand-900" />}
+              </button>
+              <button
+                onClick={() => setActiveTab('activities')}
+                className={`text-lg font-editorial font-bold transition-all relative ${
+                  activeTab === 'activities' ? 'text-brand-900' : 'text-brand-400 hover:text-brand-600'
+                }`}
+              >
+                Find Experiences
+                {activeTab === 'activities' && <span className="absolute -bottom-4 left-0 right-0 h-0.5 bg-brand-900" />}
+              </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-              {/* Activity Search */}
-              <div>
-                <Input
-                  type="search"
-                  placeholder="Search activity or city..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  leftIcon={<Search className="w-4 h-4 text-slate-400" />}
-                />
-              </div>
 
-              {/* Activity Type Filter */}
-              <div>
-                <Select
-                  value={activityCategoryFilter}
-                  onChange={(e) => setActivityCategoryFilter(e.target.value)}
-                  options={[
-                    { label: 'All Activity Types', value: 'all' },
-                    { label: 'Sightseeing', value: 'Sightseeing' },
-                    { label: 'Culture & Museum', value: 'Culture' },
-                    { label: 'Food & Culinary', value: 'Food' },
-                    { label: 'Adventure & Outdoors', value: 'Adventure' },
-                    { label: 'Architecture', value: 'Architecture' },
-                    { label: 'Entertainment', value: 'Entertainment' },
-                    { label: 'Experience', value: 'Experience' },
-                  ]}
-                />
-              </div>
-
-              {/* Activity Cost Filter */}
-              <div>
-                <Select
-                  value={activityCostFilter}
-                  onChange={(e) => setActivityCostFilter(e.target.value)}
-                  options={[
-                    { label: 'Any Cost', value: 'all' },
-                    { label: 'Free Activities', value: 'free' },
-                    { label: 'Under $25', value: 'under25' },
-                    { label: 'Under $50', value: 'under50' },
-                  ]}
-                />
-              </div>
-
-              {/* Activity Duration Filter */}
-              <div>
-                <Select
-                  value={activityDurationFilter}
-                  onChange={(e) => setActivityDurationFilter(e.target.value)}
-                  options={[
-                    { label: 'Any Duration', value: 'all' },
-                    { label: 'Quick (≤ 2 hours)', value: 'short' },
-                    { label: 'Half Day (≤ 4 hours)', value: 'halfDay' },
-                  ]}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Results Grid: Cities */}
-        {activeTab === 'cities' && (
-          <div>
-            {loading ? (
-              <div className="py-16 text-center text-slate-400 text-sm">
-                <div className="w-8 h-8 border-3 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                <p>Finding destinations...</p>
-              </div>
-            ) : cities.length === 0 ? (
-              <div className="py-16 text-center bg-white rounded-3xl border border-slate-200 p-8 space-y-3">
-                <Compass className="w-10 h-10 text-slate-400 mx-auto opacity-60" />
-                <h3 className="text-base font-bold text-slate-900">No destinations found</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Try adjusting your search keywords or resetting your budget filters.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setRegionFilter('all');
-                    setCostIndexFilter('all');
-                  }}
-                >
-                  Clear Filters
-                </Button>
+            {/* Filters */}
+            {activeTab === 'cities' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="md:col-span-1">
+                  <Input
+                    type="search"
+                    placeholder="Search by name..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    leftIcon={<Search className="w-4 h-4 text-brand-400" />}
+                  />
+                </div>
+                <div>
+                  <Select
+                    value={regionFilter}
+                    onChange={(e) => setRegionFilter(e.target.value)}
+                    options={[
+                      { label: 'All Regions', value: 'all' },
+                      { label: 'Europe', value: 'Europe' },
+                      { label: 'Asia', value: 'Asia' },
+                      { label: 'North America', value: 'North America' },
+                      { label: 'Oceania', value: 'Oceania' },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <Select
+                    value={costIndexFilter}
+                    onChange={(e) => setCostIndexFilter(e.target.value)}
+                    options={[
+                      { label: 'Any Budget', value: 'all' },
+                      { label: 'Budget ($)', value: 'Budget' },
+                      { label: 'Moderate ($$)', value: 'Moderate' },
+                      { label: 'Luxury ($$$)', value: 'Luxury' },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    options={[
+                      { label: 'Most Popular', value: 'popular' },
+                      { label: 'Rating (High-Low)', value: 'rating' },
+                      { label: 'Cost (Low to High)', value: 'cost_asc' },
+                      { label: 'Cost (High to Low)', value: 'cost_desc' },
+                    ]}
+                  />
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {cities.map((city) => {
-                  const isSaved = savedCityIds.has(Number(city.id));
-                  return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <Input
+                    type="search"
+                    placeholder="Search activity..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    leftIcon={<Search className="w-4 h-4 text-brand-400" />}
+                  />
+                </div>
+                <div>
+                  <Select
+                    value={activityCategoryFilter}
+                    onChange={(e) => setActivityCategoryFilter(e.target.value)}
+                    options={[
+                      { label: 'All Types', value: 'all' },
+                      { label: 'Sightseeing', value: 'Sightseeing' },
+                      { label: 'Culture & Museum', value: 'Culture' },
+                      { label: 'Food & Culinary', value: 'Food' },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <Select
+                    value={activityCostFilter}
+                    onChange={(e) => setActivityCostFilter(e.target.value)}
+                    options={[
+                      { label: 'Any Cost', value: 'all' },
+                      { label: 'Free', value: 'free' },
+                      { label: 'Under $50', value: 'under50' },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <Select
+                    value={activityDurationFilter}
+                    onChange={(e) => setActivityDurationFilter(e.target.value)}
+                    options={[
+                      { label: 'Any Duration', value: 'all' },
+                      { label: 'Quick (≤ 2 hours)', value: 'short' },
+                      { label: 'Half Day (≤ 4 hours)', value: 'halfDay' },
+                    ]}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Results Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-editorial font-bold text-brand-900 tracking-tight">
+              {activeTab === 'cities' ? 'Featured Destinations' : 'Curated Experiences'}
+            </h2>
+            <span className="text-sm font-semibold text-brand-500 bg-brand-100 px-3 py-1 rounded-full">
+              {activeTab === 'cities' ? cities.length : activities.length} found
+            </span>
+          </div>
+
+          {activeTab === 'cities' && (
+            <div>
+              {loading ? (
+                <div className="py-24 text-center">
+                  <div className="w-10 h-10 border-4 border-brand-200 border-t-brand-900 rounded-full animate-spin mx-auto mb-4" />
+                </div>
+              ) : cities.length === 0 ? (
+                <div className="py-24 text-center bg-surface-card rounded-[2rem] border border-surface-border">
+                  <Compass className="w-12 h-12 text-brand-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-editorial font-bold text-brand-900">No destinations found</h3>
+                  <p className="text-brand-500 mt-2">Adjust your filters to discover more.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {cities.map((city) => {
+                    const isSaved = savedCityIds.has(Number(city.id));
+                    return (
+                      <div
+                        key={city.id}
+                        className="group flex flex-col bg-surface-card rounded-[2rem] overflow-hidden border border-surface-border hover:shadow-card-hover transition-all duration-500 cursor-pointer"
+                      >
+                        <div className="relative h-64 w-full overflow-hidden">
+                          <img
+                            src={city.image_url}
+                            alt={city.name}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+                            }}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent" />
+                          
+                          <button
+                            type="button"
+                            onClick={(e) => handleToggleBookmark(city, e)}
+                            className={`absolute top-4 right-4 p-2.5 rounded-full backdrop-blur-xl transition-all ${
+                              isSaved ? 'bg-brand-900 text-white' : 'bg-surface-card/50 text-white hover:bg-surface-card/80'
+                            }`}
+                          >
+                            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-white' : ''}`} />
+                          </button>
+
+                          <div className="absolute bottom-4 left-5 right-5 text-white">
+                            <h3 className="text-2xl font-editorial font-bold tracking-tight mb-1">
+                              {city.name}
+                            </h3>
+                            <p className="text-sm font-medium text-white/80 flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5" />
+                              {city.country}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="p-6 flex flex-col flex-1">
+                          <p className="text-sm text-brand-600 line-clamp-3 mb-6">
+                            {city.description}
+                          </p>
+                          
+                          <div className="mt-auto space-y-4">
+                            <div className="flex items-center justify-between text-sm">
+                              <div className="flex items-center gap-1.5 text-brand-900 font-semibold">
+                                <DollarSign className="w-4 h-4 text-brand-400" />
+                                {city.avg_daily_cost}/day
+                              </div>
+                              <div className="flex items-center gap-1.5 text-amber-500 font-semibold">
+                                <Star className="w-4 h-4 fill-amber-500" />
+                                {city.rating}
+                              </div>
+                            </div>
+                            
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenAddCityModal(city);
+                              }}
+                              className="w-full py-3 rounded-xl border border-brand-200 text-brand-900 font-bold hover:bg-brand-50 hover:border-brand-300 transition-colors"
+                            >
+                              Add to Itinerary
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'activities' && (
+            <div>
+              {loading ? (
+                <div className="py-24 text-center">
+                  <div className="w-10 h-10 border-4 border-brand-200 border-t-brand-900 rounded-full animate-spin mx-auto mb-4" />
+                </div>
+              ) : activities.length === 0 ? (
+                <div className="py-24 text-center bg-surface-card rounded-[2rem] border border-surface-border">
+                  <Ticket className="w-12 h-12 text-brand-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-editorial font-bold text-brand-900">No experiences found</h3>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {activities.map((act) => (
                     <div
-                      key={city.id}
-                      className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-subtle hover:border-slate-300 hover:shadow-lg transition-all flex flex-col justify-between"
+                      key={act.id}
+                      className="group flex flex-col bg-surface-card rounded-[2rem] overflow-hidden border border-surface-border hover:shadow-card-hover transition-all duration-500"
                     >
-                      {/* Image Header */}
-                      <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                      <div className="relative h-56 w-full overflow-hidden">
                         <img
-                          src={city.image_url}
-                          alt={city.name}
+                          src={act.image_url}
+                          alt={act.title}
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
                           }}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
-
-                        {/* Top Badges */}
-                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                          <Badge
-                            variant={
-                              city.cost_index === 'Budget'
-                                ? 'success'
-                                : city.cost_index === 'Luxury'
-                                ? 'primary'
-                                : 'secondary'
-                            }
-                            size="sm"
-                            className="bg-white/95 backdrop-blur-md"
-                          >
-                            {city.cost_index} Cost Index
-                          </Badge>
-
-                          <button
-                            type="button"
-                            onClick={(e) => handleToggleBookmark(city, e)}
-                            className={`p-2 rounded-full backdrop-blur-md transition-all ${
-                              isSaved
-                                ? 'bg-travel-500 text-white shadow-md'
-                                : 'bg-slate-900/60 text-white hover:bg-slate-900/90'
-                            }`}
-                            title={isSaved ? 'Remove from Saved' : 'Bookmark Destination'}
-                          >
-                            <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
-                          </button>
-                        </div>
-
-                        {/* Bottom Overlay Title */}
-                        <div className="absolute bottom-3 left-3 right-3 text-white">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-black tracking-tight drop-shadow-sm truncate">
-                              {city.name}
-                            </h3>
-                            <span className="text-xs font-bold text-amber-300 flex items-center gap-0.5 shrink-0">
-                              <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
-                              {city.rating}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-200 flex items-center gap-1 font-medium">
-                            <MapPin className="w-3.5 h-3.5 text-travel-400 shrink-0" />
-                            <span>{city.country} • {city.region}</span>
-                          </p>
+                        <div className="absolute top-4 left-4">
+                          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-surface-card/90 backdrop-blur-md rounded-full text-brand-900">
+                            {act.category}
+                          </span>
                         </div>
                       </div>
 
-                      {/* City Metadata Body */}
-                      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                          {city.description}
-                        </p>
-
-                        {/* Cost & Travel Info Grid */}
-                        <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                          <div>
-                            <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                              Avg Daily Cost
-                            </span>
-                            <span className="font-extrabold text-slate-900">
-                              ${city.avg_daily_cost} / day
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                              Avg Meal Cost
-                            </span>
-                            <span className="font-extrabold text-slate-900">
-                              ${city.avg_meal_cost} / meal
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Best Months info */}
-                        {city.best_months && (
-                          <p className="text-[11px] text-slate-500 flex items-center gap-1.5 font-medium">
-                            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <span>Best Time: {city.best_months}</span>
-                          </p>
-                        )}
-
-                        {/* Action Buttons */}
-                        <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            className="w-full text-xs font-bold"
-                            onClick={() => handleOpenAddCityModal(city)}
-                            leftIcon={<Plus className="w-3.5 h-3.5" />}
-                          >
-                            Add to Trip
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Results Grid: Activities */}
-        {activeTab === 'activities' && (
-          <div>
-            {loading ? (
-              <div className="py-16 text-center text-slate-400 text-sm">
-                <div className="w-8 h-8 border-3 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                <p>Searching master activities catalog...</p>
-              </div>
-            ) : activities.length === 0 ? (
-              <div className="py-16 text-center bg-white rounded-3xl border border-slate-200 p-8 space-y-3">
-                <Ticket className="w-10 h-10 text-slate-400 mx-auto opacity-60" />
-                <h3 className="text-base font-bold text-slate-900">No activities found</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Try broadening your category or duration filters.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activities.map((act) => (
-                  <div
-                    key={act.id}
-                    className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-subtle hover:border-slate-300 hover:shadow-lg transition-all flex flex-col justify-between"
-                  >
-                    <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-                      <img
-                        src={act.image_url}
-                        alt={act.title}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
-                        }}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
-
-                      <div className="absolute top-3 left-3">
-                        <Badge variant="primary" size="sm" className="bg-white/95 backdrop-blur-md">
-                          {act.category}
-                        </Badge>
-                      </div>
-
-                      <div className="absolute bottom-3 left-3 right-3 text-white flex items-center justify-between">
-                        <span className="text-xs font-bold flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 text-travel-400" />
+                      <div className="p-6 flex flex-col flex-1">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-brand-400 mb-2 uppercase tracking-wide">
+                          <MapPin className="w-3.5 h-3.5" />
                           {act.cityName}
-                        </span>
-                        <span className="text-xs font-bold text-amber-300 flex items-center gap-0.5">
-                          <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
-                          {act.rating}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                      <div>
-                        <h4 className="font-extrabold text-slate-900 text-sm line-clamp-1">
+                        </div>
+                        <h4 className="font-editorial font-bold text-xl text-brand-900 line-clamp-2 mb-2">
                           {act.title}
                         </h4>
-                        <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                        <p className="text-sm text-brand-600 line-clamp-2 mb-6">
                           {act.description}
                         </p>
-                      </div>
 
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-3 font-semibold text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-slate-400" />
-                            {act.duration_hours}h
-                          </span>
-                          <span>•</span>
-                          <span className="font-black text-slate-900">
-                            {act.cost === 0 ? 'Free' : `$${act.cost}`}
-                          </span>
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-xs text-brand-500 mb-0.5">Duration & Cost</span>
+                            <span className="font-semibold text-brand-900">
+                              {act.duration_hours}h • {act.cost === 0 ? 'Free' : `$${act.cost}`}
+                            </span>
+                          </div>
+                          
+                          <button
+                            onClick={() => handleActivityAddToTrip(act)}
+                            className="w-12 h-12 rounded-full bg-brand-50 text-brand-900 flex items-center justify-center hover:bg-brand-900 hover:text-white transition-colors"
+                          >
+                            <Plus className="w-5 h-5" />
+                          </button>
                         </div>
-
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="h-8 text-xs px-3"
-                          onClick={() => handleActivityAddToTrip(act)}
-                          leftIcon={<Plus className="w-3.5 h-3.5" />}
-                        >
-                          Add to Trip
-                        </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
-        {/* Add City to Trip Modal */}
         <AddCityToTripModal
           isOpen={isAddCityOpen}
           onClose={() => {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { MobileNav } from './MobileNav';
 import { ToastContainer } from '../ui/Toast';
@@ -10,20 +9,14 @@ export const AppShell = ({
   onStateModeChange,
 }) => {
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-900 font-sans antialiased">
-      {/* Desktop Sidebar */}
-      <Sidebar />
+    <div className="min-h-screen flex flex-col bg-brand-50 text-brand-900 font-sans antialiased overflow-x-hidden">
+      {/* Floating Top Navbar */}
+      <Navbar stateMode={stateMode} onStateModeChange={onStateModeChange} />
 
       {/* Main Container */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navbar */}
-        <Navbar stateMode={stateMode} onStateModeChange={onStateModeChange} />
-
-        {/* Page Content Slot */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8 animate-fade-in">
-          {children}
-        </main>
-      </div>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8 animate-fade-in mt-4">
+        {children}
+      </main>
 
       {/* Mobile Bottom Navigation */}
       <MobileNav />

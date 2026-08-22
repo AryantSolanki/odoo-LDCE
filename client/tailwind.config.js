@@ -8,55 +8,50 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          200: '#C7D2FE',
-          300: '#A5B4FC',
-          400: '#818CF8',
-          500: '#6366F1',
-          600: '#4F46E5', // Primary brand color
-          700: '#4338CA',
-          800: '#3730A3',
-          900: '#312E81',
-          950: '#1E1B4B',
-        },
-        travel: {
-          50: '#FFF7ED',
-          100: '#FFEDD5',
-          200: '#FED7AA',
-          300: '#FDBA74',
-          400: '#FB923C',
-          500: '#F97316', // Warm travel accent
-          600: '#EA580C',
-          700: '#C2410C',
+          50: '#F9F8F6', // Warm ivory
+          100: '#F2EFE9', // Soft cream
+          200: '#E6E0D4',
+          300: '#D9CFC0',
+          400: '#C7B7A3', // Accent neutral
+          500: '#B09E86',
+          600: '#8A7B66',
+          700: '#665A4B',
+          800: '#40382E',
+          900: '#26211C', // Almost black editorial text
+          950: '#14120F',
         },
         surface: {
-          ground: '#F8FAFC',
+          ground: '#FDFBF7', // Very light warm background
           card: '#FFFFFF',
-          sidebar: '#0F172A', // Dark elegant sidebar
-          border: '#E2E8F0',
-          hover: '#F1F5F9',
+          sidebar: '#14120F',
+          border: '#E6E0D4',
+          hover: '#F2EFE9',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+        editorial: ['"Playfair Display"', 'Georgia', 'serif'], // Luxury editorial font
       },
       borderRadius: {
-        'xl': '0.75rem',
-        '2xl': '1rem',
-        '3xl': '1.5rem',
+        'sm': '0.5rem',     // 8px
+        'md': '0.875rem',   // 14px (small controls)
+        'lg': '1.125rem',   // 18px (standard cards)
+        'xl': '1.5rem',     // 24px (standard cards)
+        '2xl': '2rem',      // 32px (large feature cards)
+        '3xl': '2.5rem',    // 40px (hero sections)
+        '4xl': '3rem',      // 48px
       },
       boxShadow: {
-        'subtle': '0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03)',
-        'card': '0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.04)',
-        'card-hover': '0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04)',
-        'dropdown': '0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -4px rgba(15, 23, 42, 0.05)',
-        'modal': '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+        'subtle': '0 4px 20px -2px rgba(20, 18, 15, 0.05)',
+        'card': '0 8px 30px -4px rgba(20, 18, 15, 0.08)',
+        'card-hover': '0 20px 40px -4px rgba(20, 18, 15, 0.12)',
+        'dropdown': '0 10px 15px -3px rgba(20, 18, 15, 0.1)',
+        'modal': '0 25px 50px -12px rgba(20, 18, 15, 0.25)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'slide-down': 'slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-down': 'slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'pulse-subtle': 'pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
@@ -65,11 +60,11 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideDown: {
-          '0%': { opacity: '0', transform: 'translateY(-8px)' },
+          '0%': { opacity: '0', transform: 'translateY(-16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         pulseSubtle: {

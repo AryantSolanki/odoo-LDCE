@@ -39,10 +39,10 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
     <Card
       hoverEffect
       onClick={handleCardClick}
-      className="overflow-hidden flex flex-col h-full group relative border border-slate-200/80 shadow-subtle hover:shadow-card transition-all duration-300 cursor-pointer"
+      className="overflow-hidden flex flex-col h-full group relative border border-surface-border shadow-subtle hover:shadow-card-hover transition-all duration-500 cursor-pointer rounded-[2rem] bg-surface-card"
     >
       {/* Cover Image Container */}
-      <div className="relative h-48 w-full overflow-hidden bg-slate-900">
+      <div className="relative h-56 w-full overflow-hidden bg-brand-950">
         <img
           src={coverImage}
           alt={title}
@@ -50,18 +50,18 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
             e.target.onerror = null;
             e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
           }}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-90"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent" />
 
         {/* Top Badges & Actions Overlay */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10">
-          <Badge variant={statusVariant} showDot className="backdrop-blur-md bg-white/95 shadow-sm font-semibold">
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+          <Badge variant={statusVariant} showDot className="backdrop-blur-md bg-white/95 shadow-sm font-bold uppercase tracking-wider text-[10px]">
             {status}
           </Badge>
 
-          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             {onEdit && (
               <button
                 onClick={(e) => {
@@ -69,10 +69,10 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
                   e.stopPropagation();
                   onEdit(trip);
                 }}
-                className="w-8 h-8 rounded-full bg-slate-900/70 text-white backdrop-blur-md hover:bg-white hover:text-slate-900 flex items-center justify-center transition-colors shadow-sm"
+                className="w-9 h-9 rounded-full bg-brand-900/50 text-white backdrop-blur-md hover:bg-white hover:text-brand-900 flex items-center justify-center transition-colors shadow-sm"
                 title="Edit Trip Parameters"
               >
-                <Edit3 className="w-3.5 h-3.5" />
+                <Edit3 className="w-4 h-4" />
               </button>
             )}
 
@@ -83,45 +83,45 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
                   e.stopPropagation();
                   onDelete(trip);
                 }}
-                className="w-8 h-8 rounded-full bg-slate-900/70 text-rose-300 backdrop-blur-md hover:bg-rose-600 hover:text-white flex items-center justify-center transition-colors shadow-sm"
+                className="w-9 h-9 rounded-full bg-brand-900/50 text-rose-300 backdrop-blur-md hover:bg-rose-600 hover:text-white flex items-center justify-center transition-colors shadow-sm"
                 title="Delete Trip"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             )}
           </div>
         </div>
 
         {/* Bottom Image Overlay Title & Subtitle */}
-        <div className="absolute bottom-3 left-3 right-3 text-white z-10">
-          <p className="text-xs font-semibold text-travel-300 flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-travel-400 shrink-0" />
+        <div className="absolute bottom-4 left-5 right-5 text-white z-10">
+          <p className="text-xs font-bold text-brand-300 flex items-center gap-1.5 uppercase tracking-wide">
+            <MapPin className="w-4 h-4 text-brand-400 shrink-0" />
             <span className="truncate">{subtitle}</span>
           </p>
         </div>
       </div>
 
       {/* Card Content Body */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+      <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
         <div>
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="text-base font-bold text-slate-900 group-hover:text-brand-600 transition-colors line-clamp-1">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h3 className="text-2xl font-editorial font-bold text-brand-900 group-hover:text-brand-600 transition-colors line-clamp-1">
               {title}
             </h3>
-            <span className="shrink-0 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+            <span className="shrink-0 text-xs font-bold px-3 py-1 rounded-full bg-brand-50 text-brand-700">
               {citiesCount} {citiesCount === 1 ? 'City' : 'Cities'}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-2.5">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Calendar className="w-3.5 h-3.5 text-brand-500 shrink-0" />
+          <div className="flex flex-wrap items-center gap-4 text-sm text-brand-600 font-medium">
+            <span className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-brand-400 shrink-0" />
               {formatDate(startDate)} – {formatDate(endDate)}
             </span>
 
             {collaboratorsCount > 1 && (
-              <span className="flex items-center gap-1 text-slate-400">
-                <Users className="w-3.5 h-3.5" />
+              <span className="flex items-center gap-1.5 text-brand-400">
+                <Users className="w-4 h-4" />
                 {collaboratorsCount}
               </span>
             )}
@@ -129,14 +129,14 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
         </div>
 
         {/* Budget Summary & Progress Bar */}
-        <div className="pt-3 border-t border-slate-100 space-y-2">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-slate-500 font-medium">Est. Budget</span>
-            <span className="font-bold text-slate-900">
-              ${(budgetSpent || 0).toLocaleString()} <span className="text-slate-400 font-normal">/ ${(budgetTotal || 0).toLocaleString()}</span>
+        <div className="pt-5 border-t border-surface-border space-y-3">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-brand-500 font-semibold uppercase tracking-wider text-xs">Est. Budget</span>
+            <span className="font-bold text-brand-900">
+              ${(budgetSpent || 0).toLocaleString()} <span className="text-brand-400 font-medium">/ ${(budgetTotal || 0).toLocaleString()}</span>
             </span>
           </div>
-          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-brand-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 spentPercent > 90 ? 'bg-amber-500' : 'bg-brand-600'
@@ -151,8 +151,8 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
           <Button
             variant="secondary"
             size="sm"
-            className="w-full justify-between hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 transition-colors"
-            rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+            className="w-full justify-between h-12 rounded-xl text-sm font-bold border-brand-200 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-900 transition-colors"
+            rightIcon={<ArrowRight className="w-4 h-4" />}
             onClick={(e) => {
               e.stopPropagation();
               handleCardClick();

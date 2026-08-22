@@ -35,7 +35,7 @@ export const TripDetailsPage = () => {
   const { id } = useParams();
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('builder'); // 'builder' | 'view' | 'budget' | 'timeline'
+  const [activeTab, setActiveTab] = useState('builder');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const { addToast } = useToast();
@@ -57,16 +57,11 @@ export const TripDetailsPage = () => {
     fetchTripDetails();
   }, [id]);
 
-  // --- Stop Operations ---
   const handleAddStop = async (stopData) => {
     try {
       const { trip: updatedTrip, stop: newStop } = await apiService.addStop(trip.id, stopData);
       setTrip(updatedTrip);
-      addToast({
-        type: 'success',
-        title: 'Stop Added!',
-        message: `"${newStop.cityName}" has been added to your route.`,
-      });
+      addToast({ type: 'success', title: 'Stop Added!', message: `"${newStop.cityName}" has been added to your route.` });
     } catch (err) {
       addToast({ type: 'error', title: 'Failed to Add Stop', message: err.message });
     }
@@ -76,11 +71,7 @@ export const TripDetailsPage = () => {
     try {
       const { trip: updatedTrip } = await apiService.updateStop(trip.id, stopId, stopData);
       setTrip(updatedTrip);
-      addToast({
-        type: 'success',
-        title: 'Stop Updated',
-        message: `Stop details updated successfully.`,
-      });
+      addToast({ type: 'success', title: 'Stop Updated', message: `Stop details updated successfully.` });
     } catch (err) {
       addToast({ type: 'error', title: 'Failed to Update Stop', message: err.message });
     }
@@ -90,11 +81,7 @@ export const TripDetailsPage = () => {
     try {
       const updatedTrip = await apiService.deleteStop(trip.id, stopId);
       setTrip(updatedTrip);
-      addToast({
-        type: 'success',
-        title: 'Stop Removed',
-        message: `City stop removed from trip.`,
-      });
+      addToast({ type: 'success', title: 'Stop Removed', message: `City stop removed from trip.` });
     } catch (err) {
       addToast({ type: 'error', title: 'Failed to Remove Stop', message: err.message });
     }
@@ -109,20 +96,11 @@ export const TripDetailsPage = () => {
     }
   };
 
-  // --- Activity Operations ---
   const handleAddActivity = async (stopId, activityData) => {
     try {
-      const { trip: updatedTrip, activity } = await apiService.addActivity(
-        trip.id,
-        stopId,
-        activityData
-      );
+      const { trip: updatedTrip, activity } = await apiService.addActivity(trip.id, stopId, activityData);
       setTrip(updatedTrip);
-      addToast({
-        type: 'success',
-        title: 'Activity Added',
-        message: `"${activity.title}" added to itinerary.`,
-      });
+      addToast({ type: 'success', title: 'Activity Added', message: `"${activity.title}" added to itinerary.` });
     } catch (err) {
       addToast({ type: 'error', title: 'Failed to Add Activity', message: err.message });
     }
@@ -130,18 +108,9 @@ export const TripDetailsPage = () => {
 
   const handleUpdateActivity = async (stopId, activityId, activityData) => {
     try {
-      const { trip: updatedTrip } = await apiService.updateActivity(
-        trip.id,
-        stopId,
-        activityId,
-        activityData
-      );
+      const { trip: updatedTrip } = await apiService.updateActivity(trip.id, stopId, activityId, activityData);
       setTrip(updatedTrip);
-      addToast({
-        type: 'success',
-        title: 'Activity Updated',
-        message: `Activity changes saved.`,
-      });
+      addToast({ type: 'success', title: 'Activity Updated', message: `Activity changes saved.` });
     } catch (err) {
       addToast({ type: 'error', title: 'Failed to Update Activity', message: err.message });
     }
@@ -151,11 +120,7 @@ export const TripDetailsPage = () => {
     try {
       const updatedTrip = await apiService.deleteActivity(trip.id, stopId, activityId);
       setTrip(updatedTrip);
-      addToast({
-        type: 'success',
-        title: 'Activity Removed',
-        message: `Activity deleted from stop.`,
-      });
+      addToast({ type: 'success', title: 'Activity Removed', message: `Activity deleted from stop.` });
     } catch (err) {
       addToast({ type: 'error', title: 'Failed to Remove Activity', message: err.message });
     }
@@ -173,7 +138,7 @@ export const TripDetailsPage = () => {
   if (loading || !trip) {
     return (
       <AppShell>
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-7xl mx-auto">
           <SkeletonCard />
           <SkeletonCard />
         </div>
@@ -183,12 +148,12 @@ export const TripDetailsPage = () => {
 
   return (
     <AppShell>
-      <div className="space-y-6 animate-fade-in pb-16">
+      <div className="space-y-10 animate-fade-in pb-24 max-w-7xl mx-auto">
         {/* Top Back Navigation & Shared Actions */}
         <div className="flex items-center justify-between">
           <Link
             to="/trips"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-500 hover:text-brand-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to My Trips</span>
@@ -196,7 +161,7 @@ export const TripDetailsPage = () => {
         </div>
 
         {/* Hero Header */}
-        <div className="relative rounded-3xl overflow-hidden bg-slate-900 text-white min-h-[260px] flex flex-col justify-end p-6 sm:p-8 shadow-xl">
+        <div className="relative rounded-[3rem] overflow-hidden bg-brand-950 text-white min-h-[400px] flex flex-col justify-end p-8 sm:p-12 shadow-card isolate">
           <img
             src={trip.coverImage}
             alt={trip.title}
@@ -204,117 +169,115 @@ export const TripDetailsPage = () => {
               e.target.onerror = null;
               e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80';
             }}
-            className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay"
+            className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/40 to-transparent" />
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Badge variant={trip.statusVariant || 'primary'} showDot className="bg-white/95 backdrop-blur-md">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 max-w-3xl">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-brand-900/50 backdrop-blur-md border border-brand-500/30 text-brand-100 text-xs font-bold uppercase tracking-wider">
                   {trip.status}
-                </Badge>
-                <span className="text-xs text-slate-300 font-medium">
-                  • {trip.citiesCount || (trip.destinations ? trip.destinations.length : 0)} Cities Included
+                </span>
+                <span className="text-xs text-brand-200 font-semibold tracking-wide uppercase">
+                  {trip.citiesCount || (trip.destinations ? trip.destinations.length : 0)} Destinations
                 </span>
                 {trip.isPublic && (
-                  <Badge variant="success" size="sm" className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
-                    Public Link Active
-                  </Badge>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
+                    Public Link
+                  </span>
                 )}
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-editorial font-bold tracking-tight text-white leading-none">
                 {trip.title}
               </h1>
 
               {trip.description && (
-                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+                <p className="text-sm sm:text-base text-brand-200 max-w-2xl font-medium leading-relaxed">
                   {trip.description}
                 </p>
               )}
 
-              <p className="text-xs sm:text-sm text-travel-300 flex items-center gap-2 font-medium">
-                <MapPin className="w-4 h-4 text-travel-400 shrink-0" />
+              <p className="text-sm text-brand-300 flex items-center gap-2 font-semibold tracking-wide uppercase mt-4">
+                <MapPin className="w-4 h-4 text-brand-400 shrink-0" />
                 <span>{trip.subtitle}</span>
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-white/10 text-white border-white/20 hover:bg-white/20"
-                leftIcon={<Share2 className="w-4 h-4" />}
+            <div className="flex items-center gap-4 shrink-0">
+              <button
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md text-white font-bold border border-white/20 hover:bg-white/20 transition-colors"
                 onClick={() => setIsShareModalOpen(true)}
               >
-                Share Itinerary
-              </Button>
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
             </div>
           </div>
         </div>
 
         {/* Tab Selector & Mode Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-3">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-surface-border pb-6">
+          <div className="flex items-center gap-4 flex-wrap">
             <button
               onClick={() => setActiveTab('builder')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`pb-2 text-sm font-bold transition-all border-b-2 relative ${
                 activeTab === 'builder'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
-              }`}
+                  ? 'border-brand-900 text-brand-900'
+                  : 'border-transparent text-brand-400 hover:text-brand-600'
+              } flex items-center gap-2`}
             >
               <Layers className="w-4 h-4" />
-              Itinerary Builder
+              Builder
             </button>
 
             <button
               onClick={() => setActiveTab('timeline')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`pb-2 text-sm font-bold transition-all border-b-2 relative ${
                 activeTab === 'timeline'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
-              }`}
+                  ? 'border-brand-900 text-brand-900'
+                  : 'border-transparent text-brand-400 hover:text-brand-600'
+              } flex items-center gap-2`}
             >
               <Clock className="w-4 h-4" />
-              Timeline Schedule
+              Timeline
             </button>
 
             <button
               onClick={() => setActiveTab('budget')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`pb-2 text-sm font-bold transition-all border-b-2 relative ${
                 activeTab === 'budget'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
-              }`}
+                  ? 'border-brand-900 text-brand-900'
+                  : 'border-transparent text-brand-400 hover:text-brand-600'
+              } flex items-center gap-2`}
             >
               <PieChart className="w-4 h-4" />
-              Budget & Insights
+              Budget
             </button>
 
             <button
               onClick={() => setActiveTab('view')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`pb-2 text-sm font-bold transition-all border-b-2 relative ${
                 activeTab === 'view'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
-              }`}
+                  ? 'border-brand-900 text-brand-900'
+                  : 'border-transparent text-brand-400 hover:text-brand-600'
+              } flex items-center gap-2`}
             >
               <Eye className="w-4 h-4" />
-              Itinerary View
+              Preview
             </button>
           </div>
 
-          <p className="text-xs text-slate-500 hidden sm:block">
+          <p className="text-xs font-bold text-brand-500 uppercase tracking-widest bg-brand-100 px-4 py-2 rounded-full hidden sm:block">
             {formatDate(trip.startDate, 'monthDay')} – {formatDate(trip.endDate, 'monthDayYear')}
           </p>
         </div>
 
         {/* Tab Content Display */}
         {activeTab === 'builder' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+            <div className="xl:col-span-8 space-y-6">
               <ItineraryBuilder
                 trip={trip}
                 onAddStop={handleAddStop}
@@ -327,7 +290,7 @@ export const TripDetailsPage = () => {
                 onToggleActivity={handleToggleActivity}
               />
             </div>
-            <div className="lg:col-span-4 space-y-6">
+            <div className="xl:col-span-4 space-y-6">
               <TripSummarySidebar trip={trip} />
             </div>
           </div>
@@ -342,20 +305,19 @@ export const TripDetailsPage = () => {
         )}
 
         {activeTab === 'view' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+            <div className="xl:col-span-8 space-y-6">
               <ItineraryView
                 trip={trip}
                 onToggleActivity={handleToggleActivity}
               />
             </div>
-            <div className="lg:col-span-4 space-y-6">
+            <div className="xl:col-span-4 space-y-6">
               <TripSummarySidebar trip={trip} />
             </div>
           </div>
         )}
 
-        {/* Share Modal */}
         <ShareTripModal
           isOpen={isShareModalOpen}
           onClose={() => setIsShareModalOpen(false)}
