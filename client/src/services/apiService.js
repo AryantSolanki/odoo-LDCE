@@ -97,6 +97,8 @@ const saveRegisteredUsers = (users) => {
   localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(users));
 };
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 export const apiService = {

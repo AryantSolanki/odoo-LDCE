@@ -163,7 +163,6 @@ export const LoginPage = () => {
             Create account
           </Link>
         </p>
-      </div>
     </AuthLayout>
   );
 };
