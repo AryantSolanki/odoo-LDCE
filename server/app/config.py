@@ -1,4 +1,5 @@
 import os
+import secrets
 from typing import List, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -12,13 +13,13 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./globetrotter.db"
     
-    # JWT Auth
-    SECRET_KEY: str = "globetrotter_secret_key_change_in_production_hackathon_2026"
+    # JWT Auth — fallback generates a random key per process if not set in .env
+    SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 43200  # 30 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours (was 30 days)
     
-    # CORS
-    CORS_ORIGINS: Union[str, List[str]] = "*"
+    # CORS — restrict to known frontend origins
+    CORS_ORIGINS: Union[str, List[str]] = "http://localhost:5173,http://127.0.0.1:5173"
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

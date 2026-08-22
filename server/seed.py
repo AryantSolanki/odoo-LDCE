@@ -271,12 +271,14 @@ def seed_database():
         demo_user = User(
             email="demo@globetrotter.com",
             hashed_password=get_password_hash("password123"),
-            full_name="Alex Morgan"
+            full_name="Alex Morgan",
+            role="user"
         )
         admin_user = User(
             email="admin@globetrotter.com",
-            hashed_password=get_password_hash("admin123"),
-            full_name="Admin System Director"
+            hashed_password=get_password_hash("admin1234"),
+            full_name="Admin System Director",
+            role="admin"
         )
         db.add_all([demo_user, admin_user])
         db.commit()

@@ -14,10 +14,20 @@ from app.auth.dependencies import get_current_user
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Dependency that enforces admin role. Returns 403 if the user is not an admin."""
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Administrator privileges required."
+        )
+    return current_user
+
+
 @router.get("/stats")
 def get_admin_stats(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
     total_users = db.query(User).count()
     total_trips = db.query(Trip).count()
@@ -45,7 +55,7 @@ def get_admin_stats(
         "total_activities": total_activities,
         "total_planned_budget": round(float(total_budget_sum), 2),
         "top_destination": top_city_name,
-        "platform_adoption_rate": "94 text%",
+        "platform_adoption_rate": "94%",
         "active_sessions_count": max(12, total_users * 3),
     }
 
@@ -53,7 +63,7 @@ def get_admin_stats(
 @router.get("/analytics")
 def get_admin_analytics(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
     # Top booked cities
     city_counts = (
@@ -106,18 +116,17 @@ def get_admin_analytics(
 @router.get("/users")
 def get_admin_users(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
     users = db.query(User).all()
     results = []
     for u in users:
         trips_count = db.query(Trip).filter(Trip.user_id == u.id).count()
-        role = "Admin" if "admin" in u.email.lower() else "Explorer Member"
         results.append({
             "id": u.id,
             "email": u.email,
             "name": u.full_name,
-            "role": role,
+            "role": u.role.capitalize() if u.role else "User",
             "tripsCount": trips_count,
             "createdAt": u.created_at.strftime("%Y-%m-%d") if u.created_at else "2026-01-01",
             "status": "Active",
@@ -128,7 +137,7 @@ def get_admin_users(
 @router.get("/trips")
 def get_admin_trips(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
     trips = db.query(Trip).order_by(Trip.created_at.desc()).all()
     results = []
@@ -158,8 +167,15 @@ def get_admin_trips(
 def delete_user_admin(
     user_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
+    # Prevent admin from deleting themselves
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot delete your own admin account."
+        )
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
