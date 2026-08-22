@@ -44,7 +44,7 @@ export const Navbar = ({
   ];
 
   return (
-    <div className={`sticky top-0 z-50 px-4 sm:px-6 pt-4 sm:pt-6 transition-all duration-300 ${scrolled ? 'pt-2 sm:pt-2' : ''}`}>
+    <div className={`sticky top-0 z-[100] px-4 sm:px-6 pt-4 sm:pt-6 transition-all duration-300 ${scrolled ? 'pt-2 sm:pt-2' : ''}`}>
       <header className={`max-w-6xl mx-auto flex items-center justify-between h-16 sm:h-20 px-4 sm:px-8 bg-surface-card/80 backdrop-blur-xl rounded-full border border-surface-border transition-all duration-500 ${scrolled ? 'shadow-card bg-surface-card/95' : 'shadow-subtle'}`}>
         
         {/* Brand Logo */}
@@ -110,7 +110,7 @@ export const Navbar = ({
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-3 w-56 bg-surface-card rounded-2xl shadow-dropdown border border-surface-border p-2 z-40 text-sm animate-slide-up">
+              <div className="absolute right-0 mt-3 w-56 bg-surface-card rounded-2xl shadow-dropdown border border-surface-border p-2 z-[500] text-sm animate-slide-up">
                 <div className="px-3 py-3 border-b border-surface-border mb-1">
                   <p className="font-editorial font-bold text-brand-900 text-base truncate">{user?.name || 'Alex Morgan'}</p>
                   <p className="text-brand-600 text-xs truncate">{user?.email || 'alex.morgan@example.com'}</p>
