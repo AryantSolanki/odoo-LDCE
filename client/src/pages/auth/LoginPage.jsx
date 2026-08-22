@@ -8,7 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState('alex.morgan@example.com');
+  const [email, setEmail] = useState('demo@globetrotter.com');
   const [password, setPassword] = useState('password123');
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState({});

@@ -49,53 +49,126 @@ const saveStoredSavedDestinations = (list) => {
   localStorage.setItem(STORAGE_KEY_SAVED_DESTINATIONS, JSON.stringify(list));
 };
 
-// Simulated latency helper
-const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
+const STORAGE_KEY_REGISTERED_USERS = 'gt_registered_users';
+
+const DEFAULT_REGISTERED_USERS = [
+  {
+    id: 'usr_demo',
+    email: 'demo@globetrotter.com',
+    password: 'password123',
+    name: 'Alex Morgan',
+    role: 'user',
+    roleLabel: 'Explorer Member',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+    location: 'San Francisco, CA',
+    joinedDate: 'March 2024',
+    preferredCurrency: 'USD',
+    language: 'English',
+  },
+  {
+    id: 'usr_admin',
+    email: 'admin@globetrotter.com',
+    password: 'admin123',
+    name: 'System Admin',
+    role: 'admin',
+    roleLabel: 'System Administrator',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+    location: 'Global HQ',
+    joinedDate: 'Jan 2024',
+    preferredCurrency: 'USD',
+    language: 'English',
+  },
+];
+
+const getRegisteredUsers = () => {
+  const data = localStorage.getItem(STORAGE_KEY_REGISTERED_USERS);
+  if (!data) {
+    localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(DEFAULT_REGISTERED_USERS));
+    return DEFAULT_REGISTERED_USERS;
+  }
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    return DEFAULT_REGISTERED_USERS;
+  }
+};
+
+const saveRegisteredUsers = (users) => {
+  localStorage.setItem(STORAGE_KEY_REGISTERED_USERS, JSON.stringify(users));
+};
+
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 export const apiService = {
   // ==========================================
   // Auth & User Services
   // ==========================================
   login: async (email, password) => {
-    await delay(350);
+    await delay(300);
     if (!email || !password) {
       throw new Error('Please enter both email and password.');
     }
-    if (email.includes('error')) {
-      throw new Error('Invalid credentials. Please verify your email and password.');
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Try FastAPI Backend authentication first
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const isAdmin = data.user?.email?.toLowerCase().includes('admin');
+        const userObj = {
+          id: data.user.id,
+          name: data.user.full_name,
+          email: data.user.email,
+          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.user.full_name)}`,
+          role: isAdmin ? 'admin' : 'user',
+          roleLabel: isAdmin ? 'System Administrator' : 'Explorer Member',
+        };
+        localStorage.setItem('gt_auth_token', data.access_token);
+        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(userObj));
+        return { token: data.access_token, user: userObj };
+      } else if (response.status === 401 || response.status === 400 || response.status === 422) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Incorrect email or password. Access denied.');
+      }
+    } catch (err) {
+      if (err.message && (err.message.includes('Incorrect email') || err.message.includes('Access denied'))) {
+        throw err;
+      }
+      // Backend offline fallback -> check local registered users database
     }
 
-    const token = 'mock_jwt_token_' + Date.now();
-    let user;
+    // 2. Standalone registered user database verification
+    const registeredUsers = getRegisteredUsers();
+    const foundUser = registeredUsers.find((u) => u.email.toLowerCase() === cleanEmail);
 
-    // Separate Admin Role from Regular User Role
-    if (email.toLowerCase().includes('admin')) {
-      user = {
-        id: 'usr_admin',
-        name: 'System Admin',
-        email: email,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-        role: 'admin', // Dedicated admin role
-        roleLabel: 'System Administrator',
-        location: 'Global HQ',
-        joinedDate: 'Jan 2024',
-        preferredCurrency: 'USD',
-        language: 'English',
-      };
-    } else {
-      user = {
-        id: 'usr_101',
-        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-        email: email,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-        role: 'user', // Dedicated regular user role (not admin)
-        roleLabel: 'Explorer Member',
-        location: 'San Francisco, CA',
-        joinedDate: 'March 2024',
-        preferredCurrency: 'USD',
-        language: 'English',
-      };
+    if (!foundUser) {
+      throw new Error(`No account found with email "${email}". Please check your email or sign up.`);
     }
+
+    if (foundUser.password !== password) {
+      throw new Error('Incorrect password. Please verify your password and try again.');
+    }
+
+    const token = 'gt_jwt_token_' + Date.now();
+    const user = {
+      id: foundUser.id,
+      name: foundUser.name,
+      email: foundUser.email,
+      avatar: foundUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(foundUser.name)}`,
+      role: foundUser.role,
+      roleLabel: foundUser.roleLabel,
+      location: foundUser.location || 'Explorer Member',
+      joinedDate: foundUser.joinedDate || 'Member',
+      preferredCurrency: foundUser.preferredCurrency || 'USD',
+      language: foundUser.language || 'English',
+    };
 
     localStorage.setItem('gt_auth_token', token);
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
@@ -103,20 +176,70 @@ export const apiService = {
   },
 
   signup: async ({ name, email, password }) => {
-    await delay(350);
+    await delay(300);
     if (!name || !email || !password) {
-      throw new Error('All required fields must be completed.');
+      throw new Error('All required fields (Name, Email, Password) must be filled.');
     }
 
-    const token = 'mock_jwt_token_' + Date.now();
-    const isAdminSignup = email.toLowerCase().includes('admin');
-    const user = {
-      id: 'usr_' + Math.floor(Math.random() * 1000),
-      name,
-      email,
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Check if email already registered in local database
+    const registeredUsers = getRegisteredUsers();
+    const existingLocal = registeredUsers.find((u) => u.email.toLowerCase() === cleanEmail);
+    if (existingLocal) {
+      throw new Error(`An account with email "${email}" already exists. Please log in instead.`);
+    }
+
+    // Try FastAPI Backend Registration
+    let backendUser = null;
+    let backendToken = null;
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name: name, email: cleanEmail, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        backendToken = data.access_token;
+        backendUser = data.user;
+      } else if (response.status === 400 || response.status === 422) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || 'A user with this email already exists.');
+      }
+    } catch (err) {
+      if (err.message && err.message.includes('already exists')) {
+        throw err;
+      }
+    }
+
+    // Register user in local database
+    const isAdmin = cleanEmail.includes('admin');
+    const newUserRecord = {
+      id: backendUser ? backendUser.id : 'usr_' + Date.now(),
+      email: cleanEmail,
+      password: password,
+      name: name,
+      role: isAdmin ? 'admin' : 'user',
+      roleLabel: isAdmin ? 'System Administrator' : 'Explorer Member',
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
-      role: isAdminSignup ? 'admin' : 'user', // Dedicated role separation
-      roleLabel: isAdminSignup ? 'System Administrator' : 'Explorer Member',
+      joinedDate: 'Just now',
+      preferredCurrency: 'USD',
+      language: 'English',
+    };
+
+    registeredUsers.push(newUserRecord);
+    saveRegisteredUsers(registeredUsers);
+
+    const token = backendToken || ('gt_jwt_token_' + Date.now());
+    const user = {
+      id: newUserRecord.id,
+      name: newUserRecord.name,
+      email: newUserRecord.email,
+      avatar: newUserRecord.avatar,
+      role: newUserRecord.role,
+      roleLabel: newUserRecord.roleLabel,
       location: 'New Member',
       joinedDate: 'Just now',
       preferredCurrency: 'USD',
