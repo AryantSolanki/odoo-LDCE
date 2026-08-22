@@ -29,6 +29,8 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { validateStopDates, validateActivityDate, formatDate } from '../../utils/dateValidation';
 import { useToast } from '../../hooks/useToast';
+import { ActivityDiscoveryModal } from './ActivityDiscoveryModal';
+import { Compass } from 'lucide-react';
 
 const CATEGORY_COLORS = {
   Sightseeing: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -93,6 +95,10 @@ export const ItineraryBuilder = ({
     description: '',
   });
   const [activityError, setActivityError] = useState('');
+
+  // Activity Discovery Modal State
+  const [discoveryModalOpen, setDiscoveryModalOpen] = useState(false);
+  const [discoveryStop, setDiscoveryStop] = useState(null);
 
   // Delete Confirm Modal
   const [confirmDeleteModal, setConfirmDeleteModal] = useState({
@@ -383,12 +389,25 @@ export const ItineraryBuilder = ({
                       </div>
 
                       <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-brand-50/50 text-brand-700 border-brand-200 hover:bg-brand-50"
+                        leftIcon={<Compass className="w-3.5 h-3.5 text-brand-600" />}
+                        onClick={() => {
+                          setDiscoveryStop(stop);
+                          setDiscoveryModalOpen(true);
+                        }}
+                      >
+                        Discover
+                      </Button>
+
+                      <Button
                         variant="secondary"
                         size="sm"
                         leftIcon={<Plus className="w-3.5 h-3.5" />}
                         onClick={() => handleOpenAddActivity(stop)}
                       >
-                        Add Activity
+                        Add Custom
                       </Button>
 
                       <div className="flex items-center gap-1">
@@ -762,6 +781,23 @@ export const ItineraryBuilder = ({
           Are you sure you want to remove <strong className="text-slate-900">{confirmDeleteModal.title}</strong>?
         </p>
       </Modal>
+
+      {/* --- ACTIVITY DISCOVERY MODAL --- */}
+      <ActivityDiscoveryModal
+        isOpen={discoveryModalOpen}
+        onClose={() => {
+          setDiscoveryModalOpen(false);
+          setDiscoveryStop(null);
+        }}
+        tripId={trip.id}
+        stopId={discoveryStop?.id}
+        cityName={discoveryStop?.cityName}
+        onActivityAdded={() => {
+          if (onAddActivity) {
+            // Trigger refresh
+          }
+        }}
+      />
     </div>
   );
 };

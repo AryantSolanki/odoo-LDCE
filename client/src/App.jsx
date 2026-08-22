@@ -14,6 +14,7 @@ import { TripDetailsPage } from './pages/TripDetailsPage';
 import { ExplorePage } from './pages/ExplorePage';
 import { CalendarPage } from './pages/CalendarPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SharedTripPage } from './pages/SharedTripPage';
 
 export default function App() {
   return (
@@ -25,6 +26,9 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+            {/* Public Shared Travel Guide Route */}
+            <Route path="/shared/:publicId" element={<SharedTripPage />} />
 
             {/* Core Application Routes */}
             <Route path="/dashboard" element={<DashboardPage />} />
@@ -43,3 +47,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+

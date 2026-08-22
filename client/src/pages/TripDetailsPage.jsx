@@ -13,6 +13,8 @@ import {
   Eye,
   CheckCircle,
   Plus,
+  PieChart,
+  Clock,
 } from 'lucide-react';
 import { AppShell } from '../components/layout/AppShell';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
@@ -22,6 +24,9 @@ import { SkeletonCard } from '../components/ui/Skeleton';
 import { ItineraryBuilder } from '../components/trip/ItineraryBuilder';
 import { ItineraryView } from '../components/trip/ItineraryView';
 import { TripSummarySidebar } from '../components/trip/TripSummarySidebar';
+import { BudgetDashboard } from '../components/trip/BudgetDashboard';
+import { TripTimelineView } from '../components/trip/TripTimelineView';
+import { ShareTripModal } from '../components/trip/ShareTripModal';
 import { apiService } from '../services/apiService';
 import { useToast } from '../hooks/useToast';
 import { formatDate } from '../utils/dateValidation';
@@ -30,7 +35,8 @@ export const TripDetailsPage = () => {
   const { id } = useParams();
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('builder'); // 'builder' | 'view'
+  const [activeTab, setActiveTab] = useState('builder'); // 'builder' | 'view' | 'budget' | 'timeline'
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -207,6 +213,11 @@ export const TripDetailsPage = () => {
                 <span className="text-xs text-slate-300 font-medium">
                   • {trip.citiesCount || (trip.destinations ? trip.destinations.length : 0)} Cities Included
                 </span>
+                {trip.isPublic && (
+                  <Badge variant="success" size="sm" className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
+                    Public Link Active
+                  </Badge>
+                )}
               </div>
 
               <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
@@ -231,16 +242,9 @@ export const TripDetailsPage = () => {
                 size="sm"
                 className="bg-white/10 text-white border-white/20 hover:bg-white/20"
                 leftIcon={<Share2 className="w-4 h-4" />}
-                onClick={() => {
-                  navigator.clipboard?.writeText(window.location.href);
-                  addToast({
-                    type: 'success',
-                    title: 'Link Copied',
-                    message: 'Trip itinerary link copied to clipboard.',
-                  });
-                }}
+                onClick={() => setIsShareModalOpen(true)}
               >
-                Share
+                Share Itinerary
               </Button>
             </div>
           </div>
@@ -248,7 +252,7 @@ export const TripDetailsPage = () => {
 
         {/* Tab Selector & Mode Switcher */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setActiveTab('builder')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
@@ -259,6 +263,30 @@ export const TripDetailsPage = () => {
             >
               <Layers className="w-4 h-4" />
               Itinerary Builder
+            </button>
+
+            <button
+              onClick={() => setActiveTab('timeline')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+                activeTab === 'timeline'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
+            >
+              <Clock className="w-4 h-4" />
+              Timeline Schedule
+            </button>
+
+            <button
+              onClick={() => setActiveTab('budget')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+                activeTab === 'budget'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+              }`}
+            >
+              <PieChart className="w-4 h-4" />
+              Budget & Insights
             </button>
 
             <button
@@ -275,15 +303,14 @@ export const TripDetailsPage = () => {
           </div>
 
           <p className="text-xs text-slate-500 hidden sm:block">
-            {formatDate(trip.startDate, 'monthDay')} – {formatDate(trip.endDate, 'monthDay')}
+            {formatDate(trip.startDate, 'monthDay')} – {formatDate(trip.endDate, 'monthDayYear')}
           </p>
         </div>
 
-        {/* Main Content Layout: Left Workspace + Right Desktop Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Builder or Presentation View */}
-          <div className="lg:col-span-8 space-y-6">
-            {activeTab === 'builder' ? (
+        {/* Tab Content Display */}
+        {activeTab === 'builder' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-8 space-y-6">
               <ItineraryBuilder
                 trip={trip}
                 onAddStop={handleAddStop}
@@ -295,20 +322,44 @@ export const TripDetailsPage = () => {
                 onDeleteActivity={handleDeleteActivity}
                 onToggleActivity={handleToggleActivity}
               />
-            ) : (
+            </div>
+            <div className="lg:col-span-4 space-y-6">
+              <TripSummarySidebar trip={trip} />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'timeline' && (
+          <TripTimelineView trip={trip} onTimelineUpdated={fetchTripDetails} />
+        )}
+
+        {activeTab === 'budget' && (
+          <BudgetDashboard trip={trip} onBudgetUpdated={fetchTripDetails} />
+        )}
+
+        {activeTab === 'view' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-8 space-y-6">
               <ItineraryView
                 trip={trip}
                 onToggleActivity={handleToggleActivity}
               />
-            )}
+            </div>
+            <div className="lg:col-span-4 space-y-6">
+              <TripSummarySidebar trip={trip} />
+            </div>
           </div>
+        )}
 
-          {/* Right Column: Desktop Summary Panel */}
-          <div className="lg:col-span-4 space-y-6">
-            <TripSummarySidebar trip={trip} />
-          </div>
-        </div>
+        {/* Share Modal */}
+        <ShareTripModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          trip={trip}
+          onTripUpdated={(updated) => setTrip(updated)}
+        />
       </div>
     </AppShell>
   );
 };
+
