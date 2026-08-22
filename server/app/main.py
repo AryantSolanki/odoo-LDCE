@@ -19,6 +19,7 @@ from app.routers import (
     timeline_router,
     share_router,
     expenses_router,
+    admin_router,
 )
 
 # Auto-create database tables on startup
@@ -74,6 +75,8 @@ app.include_router(budget_router)
 app.include_router(timeline_router)
 app.include_router(share_router)
 app.include_router(expenses_router)
+app.include_router(admin_router)
+
 
 
 @app.get("/", tags=["Health Check"])

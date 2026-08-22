@@ -208,6 +208,10 @@ export const ActivityDiscoveryModal = ({
                     <img
                       src={activity.image_url}
                       alt={activity.title}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80';
+                      }}
                       className="w-20 h-20 rounded-xl object-cover shrink-0 bg-slate-100"
                     />
 

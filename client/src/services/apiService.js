@@ -22,7 +22,22 @@ const getStoredTrips = () => {
     return INITIAL_TRIPS;
   }
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (!Array.isArray(parsed) || parsed.length === 0) return INITIAL_TRIPS;
+    // Sanitize trips to fix any old/broken cover images or stops
+    let modified = false;
+    const sanitized = parsed.map((t, idx) => {
+      let img = t.coverImage;
+      if (!img || typeof img !== 'string' || img.trim() === '') {
+        img = DEFAULT_COVER_IMAGES[idx % DEFAULT_COVER_IMAGES.length].url;
+        modified = true;
+      }
+      return { ...t, coverImage: img };
+    });
+    if (modified) {
+      localStorage.setItem(STORAGE_KEY_TRIPS, JSON.stringify(sanitized));
+    }
+    return sanitized;
   } catch (e) {
     return INITIAL_TRIPS;
   }
@@ -66,7 +81,14 @@ export const apiService = {
     }
     const token = 'mock_jwt_token_' + Date.now();
     const existing = apiService.getCurrentUser();
-    const user = { ...existing, email };
+    const isAdmin = email.toLowerCase().includes('admin');
+    const user = {
+      ...existing,
+      email,
+      name: isAdmin ? 'Admin Director' : (existing.name || 'Alex Morgan'),
+      role: isAdmin ? 'System Administrator' : 'Explorer Member',
+      isAdmin,
+    };
     localStorage.setItem('gt_auth_token', token);
     localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
     return { token, user };
@@ -965,6 +987,93 @@ export const apiService = {
 
     saveStoredTrips(trips);
     return trip;
+  },
+
+  // ==========================================
+  // Phase 6: Admin & Analytics Dashboard API
+  // ==========================================
+  getAdminStats: async () => {
+    await delay(250);
+    const trips = getStoredTrips();
+    const totalPlannedBudget = trips.reduce((sum, t) => sum + (Number(t.budgetTotal) || 0), 0);
+    return {
+      total_users: 148,
+      total_trips: trips.length + 32,
+      total_cities: 8,
+      total_activities: 18,
+      total_planned_budget: totalPlannedBudget + 185000,
+      top_destination: 'Tokyo, Japan',
+      platform_adoption_rate: '96.4%',
+      active_sessions_count: 38,
+    };
+  },
+
+  getAdminAnalytics: async () => {
+    await delay(300);
+    return {
+      top_cities: [
+        { name: 'Tokyo', country: 'Japan', tripsCount: 42, avgCost: 130 },
+        { name: 'Paris', country: 'France', tripsCount: 38, avgCost: 150 },
+        { name: 'Rome', country: 'Italy', tripsCount: 31, avgCost: 120 },
+        { name: 'Barcelona', country: 'Spain', tripsCount: 29, avgCost: 110 },
+        { name: 'New York City', country: 'United States', tripsCount: 25, avgCost: 200 },
+        { name: 'Kyoto', country: 'Japan', tripsCount: 22, avgCost: 115 },
+      ],
+      activity_distribution: [
+        { category: 'Sightseeing', count: 68 },
+        { category: 'Food & Culinary', count: 54 },
+        { category: 'Culture & History', count: 41 },
+        { category: 'Adventure & Nature', count: 32 },
+        { category: 'Shopping & Nightlife', count: 27 },
+      ],
+      monthly_trend: [
+        { month: 'Apr', trips: 18, users: 12, budget: 32000 },
+        { month: 'May', trips: 29, users: 21, budget: 48500 },
+        { month: 'Jun', trips: 44, users: 38, budget: 76000 },
+        { month: 'Jul', trips: 62, users: 51, budget: 112000 },
+        { month: 'Aug', trips: 85, users: 74, budget: 158000 },
+      ],
+    };
+  },
+
+  getAdminUsers: async () => {
+    await delay(250);
+    return [
+      { id: 'usr_1', name: 'Admin Director', email: 'admin@globetrotter.com', role: 'System Administrator', tripsCount: 14, createdAt: '2026-01-10', status: 'Active' },
+      { id: 'usr_2', name: 'Alex Morgan', email: 'demo@globetrotter.com', role: 'Explorer Member', tripsCount: 3, createdAt: '2026-02-14', status: 'Active' },
+      { id: 'usr_3', name: 'Elena Rostova', email: 'elena@example.com', role: 'Explorer Member', tripsCount: 5, createdAt: '2026-03-01', status: 'Active' },
+      { id: 'usr_4', name: 'Marcus Chen', email: 'marcus@example.com', role: 'Explorer Member', tripsCount: 8, createdAt: '2026-03-18', status: 'Active' },
+      { id: 'usr_5', name: 'Sophia Dubois', email: 'sophia@example.com', role: 'Explorer Member', tripsCount: 2, createdAt: '2026-04-05', status: 'Active' },
+      { id: 'usr_6', name: 'Liam Wilson', email: 'liam@example.com', role: 'Explorer Member', tripsCount: 4, createdAt: '2026-05-12', status: 'Active' },
+    ];
+  },
+
+  updateUserRole: async (userId, newRole) => {
+    await delay(200);
+    return { userId, role: newRole, success: true };
+  },
+
+  deleteUserAdmin: async (userId) => {
+    await delay(200);
+    return { userId, success: true };
+  },
+
+  getAdminTrips: async () => {
+    await delay(300);
+    const trips = getStoredTrips();
+    return trips.map((t) => ({
+      id: t.id,
+      title: t.title,
+      user_name: 'Alex Morgan',
+      user_email: 'demo@globetrotter.com',
+      startDate: t.startDate,
+      endDate: t.endDate,
+      budget: Number(t.budgetTotal) || 2500,
+      stopsCount: t.stops ? t.stops.length : t.citiesCount || 1,
+      destinations: t.destinations || ['Multi-City'],
+      isPublic: !!t.isPublic,
+      publicId: t.publicId || 'gt_pub_demo',
+    }));
   },
 };
 

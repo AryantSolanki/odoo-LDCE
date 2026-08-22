@@ -12,6 +12,7 @@ import {
   ChevronRight,
   LogOut,
   HelpCircle,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -35,6 +36,7 @@ export const Sidebar = () => {
 
   const secondaryItems = [
     { label: 'Settings', path: '/settings', icon: Settings },
+    { label: 'Admin Analytics', path: '/admin', icon: ShieldCheck },
   ];
 
   return (
@@ -141,6 +143,10 @@ export const Sidebar = () => {
             <img
               src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80'}
               alt={user?.name || 'User Avatar'}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
+              }}
               className="w-9 h-9 rounded-full object-cover border border-slate-700 shrink-0"
             />
             {!collapsed && (

@@ -239,7 +239,15 @@ export const NewTripPage = () => {
                           isSelected ? 'border-brand-600 ring-2 ring-brand-500/20' : 'border-transparent hover:opacity-90'
                         }`}
                       >
-                        <img src={imgItem.url} alt={imgItem.name} className="w-full h-full object-cover" />
+                        <img
+                          src={imgItem.url}
+                          alt={imgItem.name}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80';
+                          }}
+                          className="w-full h-full object-cover"
+                        />
                         {isSelected && (
                           <div className="absolute inset-0 bg-brand-900/40 flex items-center justify-center">
                             <CheckCircle className="w-5 h-5 text-white" />

@@ -36,6 +36,10 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
         <img
           src={coverImage}
           alt={title}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out opacity-90"
           loading="lazy"
         />

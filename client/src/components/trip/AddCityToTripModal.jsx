@@ -89,6 +89,10 @@ export const AddCityToTripModal = ({ isOpen, onClose, city }) => {
           <img
             src={city.image_url}
             alt={city.name}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80';
+            }}
             className="w-14 h-14 rounded-lg object-cover shrink-0"
           />
           <div className="min-w-0">

@@ -15,6 +15,7 @@ import { ExplorePage } from './pages/ExplorePage';
 import { CalendarPage } from './pages/CalendarPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SharedTripPage } from './pages/SharedTripPage';
+import { AdminPage } from './pages/AdminPage';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/admin" element={<AdminPage />} />
 
             {/* Fallback Catch-all Route */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

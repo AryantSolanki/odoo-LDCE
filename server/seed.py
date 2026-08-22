@@ -20,7 +20,7 @@ def seed_database():
             country="France",
             latitude=48.8566,
             longitude=2.3522,
-            image_url="https://images.unsplash.com/photo-1502602898657-3e91760cbb34",
+            image_url="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
             description="The City of Light, famous for its romance, gastronomy, art museums, and iconic Eiffel Tower.",
             avg_daily_cost=150.0,
             avg_meal_cost=30.0
@@ -30,7 +30,7 @@ def seed_database():
             country="Japan",
             latitude=35.6762,
             longitude=139.6503,
-            image_url="https://images.unsplash.com/photo-1503899036084-c55cdd92da26",
+            image_url="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80",
             description="A dazzling ultra-modern metropolis blending neon skyscrapers, ancient historic temples, and exquisite cuisine.",
             avg_daily_cost=130.0,
             avg_meal_cost=20.0
@@ -40,7 +40,7 @@ def seed_database():
             country="United States",
             latitude=40.7128,
             longitude=-74.0060,
-            image_url="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9",
+            image_url="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80",
             description="The Big Apple, featuring Central Park, Broadway shows, world-class nightlife, and iconic skyline views.",
             avg_daily_cost=200.0,
             avg_meal_cost=35.0
@@ -50,7 +50,7 @@ def seed_database():
             country="Italy",
             latitude=41.9028,
             longitude=12.4964,
-            image_url="https://images.unsplash.com/photo-1552832230-c0197dd311b5",
+            image_url="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80",
             description="The Eternal City, renowned for millennia of history, ancient Colosseum ruins, and delicious authentic pasta.",
             avg_daily_cost=120.0,
             avg_meal_cost=25.0
@@ -60,7 +60,7 @@ def seed_database():
             country="Spain",
             latitude=41.3851,
             longitude=2.1734,
-            image_url="https://images.unsplash.com/photo-1539037116277-4db20889f2d4",
+            image_url="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=800&q=80",
             description="Vibrant seaside city known for Gaudi architecture, sunny beaches, tapas bars, and lively night street culture.",
             avg_daily_cost=110.0,
             avg_meal_cost=22.0
@@ -70,7 +70,7 @@ def seed_database():
             country="United Kingdom",
             latitude=51.5074,
             longitude=-0.1278,
-            image_url="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad",
+            image_url="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80",
             description="Historic royal capital along the Thames featuring Big Ben, the London Eye, West End theatres, and pub culture.",
             avg_daily_cost=180.0,
             avg_meal_cost=32.0
@@ -80,7 +80,7 @@ def seed_database():
             country="Indonesia",
             latitude=-8.4095,
             longitude=115.1889,
-            image_url="https://images.unsplash.com/photo-1537996194471-e657df975ab4",
+            image_url="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
             description="Tropical island paradise known for lush rice terraces, serene Hindu temples, surfing, and wellness retreats.",
             avg_daily_cost=60.0,
             avg_meal_cost=10.0
@@ -90,7 +90,7 @@ def seed_database():
             country="Australia",
             latitude=-33.8688,
             longitude=151.2093,
-            image_url="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9",
+            image_url="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80",
             description="Stunning coastal harbor city home to Bondi Beach, Sydney Opera House, and breathtaking coastal walks.",
             avg_daily_cost=160.0,
             avg_meal_cost=28.0
@@ -267,15 +267,22 @@ def seed_database():
         db.add_all(activities)
         db.commit()
 
-        print("[+] Seeding demo user...")
+        print("[+] Seeding demo user and admin user...")
         demo_user = User(
             email="demo@globetrotter.com",
             hashed_password=get_password_hash("password123"),
             full_name="Alex Morgan"
         )
-        db.add(demo_user)
+        admin_user = User(
+            email="admin@globetrotter.com",
+            hashed_password=get_password_hash("admin123"),
+            full_name="Admin System Director"
+        )
+        db.add_all([demo_user, admin_user])
         db.commit()
         db.refresh(demo_user)
+        db.refresh(admin_user)
+
 
         print("[+] Seeding demo European Multi-City trip...")
         start_dt = datetime.date.today() + datetime.timedelta(days=30)

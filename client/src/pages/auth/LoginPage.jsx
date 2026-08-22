@@ -167,6 +167,35 @@ export const LoginPage = () => {
           </Button>
         </div>
 
+        {/* Demo Quick Accounts */}
+        <div className="pt-3 border-t border-slate-100">
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-2">
+            Quick Demo 1-Click Login
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('demo@globetrotter.com');
+                setPassword('password123');
+              }}
+              className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-semibold text-slate-700 transition-colors"
+            >
+              Demo Traveler
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin@globetrotter.com');
+                setPassword('admin123');
+              }}
+              className="px-3 py-1.5 rounded-lg border border-brand-200 bg-brand-50 hover:bg-brand-100 text-[11px] font-semibold text-brand-700 transition-colors"
+            >
+              Demo Admin
+            </button>
+          </div>
+        </div>
+
         <p className="text-xs text-slate-500 pt-2">
           Don't have an account?{' '}
           <Link to="/signup" className="font-bold text-brand-600 hover:text-brand-700 transition-colors">

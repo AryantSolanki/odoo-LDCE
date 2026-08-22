@@ -8,6 +8,7 @@ from app.routers.budget import router as budget_router
 from app.routers.timeline import router as timeline_router
 from app.routers.share import router as share_router
 from app.routers.expenses import router as expenses_router
+from app.routers.admin import router as admin_router
 
 __all__ = [
     "auth_router",
@@ -20,4 +21,6 @@ __all__ = [
     "timeline_router",
     "share_router",
     "expenses_router",
+    "admin_router",
 ]
+

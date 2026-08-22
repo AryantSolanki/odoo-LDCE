@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Globe,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -104,6 +105,10 @@ export const MobileNav = () => {
               <img
                 src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80'}
                 alt={user?.name || 'User'}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
+                }}
                 className="w-10 h-10 rounded-full object-cover border border-slate-700"
               />
               <div className="min-w-0 flex-1">
@@ -168,6 +173,15 @@ export const MobileNav = () => {
                 >
                   <Settings className="w-5 h-5" />
                   <span>Settings</span>
+                </NavLink>
+
+                <NavLink
+                  to="/admin"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800"
+                >
+                  <ShieldCheck className="w-5 h-5" />
+                  <span>Admin Analytics</span>
                 </NavLink>
               </div>
             </div>

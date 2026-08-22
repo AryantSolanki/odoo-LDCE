@@ -157,6 +157,10 @@ export const CalendarPage = () => {
                     <img
                       src={trip.coverImage}
                       alt={trip.title}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80';
+                      }}
                       className="w-16 h-16 rounded-xl object-cover shrink-0"
                     />
                     <div>

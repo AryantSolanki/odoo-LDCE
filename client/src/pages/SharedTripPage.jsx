@@ -164,6 +164,10 @@ export const SharedTripPage = () => {
           <img
             src={trip.coverImage}
             alt={trip.title}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80';
+            }}
             className="absolute inset-0 w-full h-full object-cover opacity-45"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
