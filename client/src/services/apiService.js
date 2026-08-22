@@ -624,9 +624,268 @@ export const apiService = {
     return trip;
   },
 
+  getTripTimeline: async (tripId) => {
+    await delay(200);
+    const trips = getStoredTrips();
+    const trip = trips.find((t) => String(t.id) === String(tripId));
+    if (!trip) throw new Error('Trip not found.');
+
+    const start = new Date(trip.startDate);
+    const end = new Date(trip.endDate);
+    const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
+
+    const days = [];
+    let currentDate = new Date(start);
+    for (let i = 1; i <= totalDays; i++) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      let stop = null;
+      if (trip.stops && trip.stops.length > 0) {
+        stop = trip.stops.find(s => s.startDate <= dateStr && s.endDate >= dateStr);
+        if (!stop) {
+            stop = trip.stops[0]; 
+        }
+      }
+
+      const events = [];
+      if (stop) {
+        if (stop.startDate === dateStr) {
+          events.push({
+            id: `arr_${stop.id}`,
+            eventType: 'stop_arrival',
+            title: `Arrive in ${stop.cityName}`,
+            time: '10:00 AM',
+            cost: stop.transportCost || 0
+          });
+        }
+        if (stop.endDate === dateStr && stop.startDate !== dateStr) {
+            events.push({
+                id: `dep_${stop.id}`,
+                eventType: 'stop_departure',
+                title: `Depart from ${stop.cityName}`,
+                time: 'Evening',
+                cost: 0
+            });
+        }
+        const activities = (stop.activities || []).filter(a => a.date === dateStr);
+        activities.forEach(act => {
+          events.push({
+            ...act,
+            eventType: 'activity',
+            activityId: act.id,
+          });
+        });
+      }
+
+      const expenses = (trip.expenses || []).filter(e => e.date === dateStr);
+      expenses.forEach(e => {
+        events.push({
+            id: e.id,
+            eventType: 'expense',
+            title: `Expense: ${e.category}`,
+            description: e.description,
+            time: 'Day',
+            cost: e.amount
+        });
+      });
+
+      days.push({
+        dayNumber: i,
+        date: dateStr,
+        cityName: stop ? stop.cityName : 'Planning',
+        country: stop ? stop.country : '',
+        stopId: stop ? stop.id : null,
+        events,
+      });
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return {
+      trip_id: trip.id,
+      total_days: totalDays,
+      days,
+    };
+  },
+
+  getTripBudget: async (tripId) => {
+    await delay(200);
+    const trips = getStoredTrips();
+    const trip = trips.find((t) => String(t.id) === String(tripId));
+    if (!trip) throw new Error('Trip not found.');
+
+    const budgetLimit = trip.budgetTotal || 5000;
+    let transport = 0;
+    let stay = 0;
+    let activities = 0;
+    let meals = 0;
+    let other = 0;
+
+    const start = new Date(trip.startDate);
+    const end = new Date(trip.endDate);
+    const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
+
+    const dailySpending = [];
+    const targetDailyBudget = Math.round(budgetLimit / totalDays);
+
+    let currentDate = new Date(start);
+    for (let i = 1; i <= totalDays; i++) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      let stop = null;
+      if (trip.stops && trip.stops.length > 0) {
+        stop = trip.stops.find(s => s.startDate <= dateStr && s.endDate >= dateStr);
+      }
+      
+      let dayTransport = 0;
+      let dayStay = 0;
+      let dayActivities = 0;
+      let dayMeals = 0;
+      let dayOther = 0;
+      
+      if (stop) {
+        if (stop.startDate === dateStr) {
+          dayTransport += Number(stop.transportCost || 0);
+        }
+        dayStay += Number(stop.stayCostPerNight || 0);
+        dayMeals += 45; 
+        
+        const acts = (stop.activities || []).filter(a => a.date === dateStr);
+        acts.forEach(a => dayActivities += Number(a.cost || 0));
+      }
+
+      const dayExpenses = (trip.expenses || []).filter(e => e.date === dateStr);
+      dayExpenses.forEach(e => {
+        const amt = Number(e.amount || 0);
+        if (e.category === 'Meals') dayMeals += amt;
+        else if (e.category === 'Transport') dayTransport += amt;
+        else if (e.category === 'Activities') dayActivities += amt;
+        else if (e.category === 'Stay') dayStay += amt;
+        else dayOther += amt;
+      });
+
+      const totalDay = dayTransport + dayStay + dayActivities + dayMeals + dayOther;
+
+      dailySpending.push({
+        dayLabel: `Day ${i}`,
+        cityName: stop ? stop.cityName : 'In Transit',
+        date: dateStr,
+        transport: dayTransport,
+        stay: dayStay,
+        activities: dayActivities,
+        meals: dayMeals,
+        other: dayOther,
+        total: totalDay,
+        targetDailyBudget: targetDailyBudget,
+        isOverBudget: totalDay > targetDailyBudget
+      });
+
+      transport += dayTransport;
+      stay += dayStay;
+      activities += dayActivities;
+      meals += dayMeals;
+      other += dayOther;
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    const totalEstimated = transport + stay + activities + meals + other;
+    
+    const categories = [
+      { category: 'Transport', amount: transport, color: '#3b82f6', percentage: Math.round((transport/totalEstimated)*100) || 0 },
+      { category: 'Stay', amount: stay, color: '#10b981', percentage: Math.round((stay/totalEstimated)*100) || 0 },
+      { category: 'Meals', amount: meals, color: '#f59e0b', percentage: Math.round((meals/totalEstimated)*100) || 0 },
+      { category: 'Activities', amount: activities, color: '#8b5cf6', percentage: Math.round((activities/totalEstimated)*100) || 0 },
+      { category: 'Other', amount: other, color: '#64748b', percentage: Math.round((other/totalEstimated)*100) || 0 },
+    ];
+
+    return {
+      budget_limit: budgetLimit,
+      total_estimated_cost: totalEstimated,
+      average_daily_cost: Math.round(totalEstimated / totalDays) || 0,
+      target_daily_budget: targetDailyBudget,
+      total_days: totalDays,
+      transport,
+      stay,
+      activities,
+      meals,
+      other_expenses: other,
+      over_budget: totalEstimated > budgetLimit,
+      budget_difference: Math.abs(budgetLimit - totalEstimated),
+      categories,
+      dailySpending,
+      overBudgetDays: dailySpending.filter(d => d.isOverBudget),
+      expenses: trip.expenses || []
+    };
+  },
+
+  addExpense: async (tripId, expenseData) => {
+    await delay(200);
+    const trips = getStoredTrips();
+    const trip = trips.find((t) => String(t.id) === String(tripId));
+    if (!trip) throw new Error('Trip not found.');
+
+    if (!trip.expenses) trip.expenses = [];
+    const newExpense = {
+      id: 'exp_' + Date.now(),
+      ...expenseData,
+      amount: Number(expenseData.amount) || 0
+    };
+    trip.expenses.push(newExpense);
+    trip.budgetSpent = (trip.budgetSpent || 0) + newExpense.amount;
+    
+    saveStoredTrips(trips);
+    return { trip, expense: newExpense };
+  },
+
+  deleteExpense: async (tripId, expenseId) => {
+    await delay(200);
+    const trips = getStoredTrips();
+    const trip = trips.find((t) => String(t.id) === String(tripId));
+    if (!trip) throw new Error('Trip not found.');
+
+    if (trip.expenses) {
+      const exp = trip.expenses.find(e => String(e.id) === String(expenseId));
+      if (exp) {
+        trip.budgetSpent = Math.max(0, (trip.budgetSpent || 0) - exp.amount);
+        trip.expenses = trip.expenses.filter(e => String(e.id) !== String(expenseId));
+      }
+    }
+    
+    saveStoredTrips(trips);
+    return trip;
+  },
+
   getDestinations: async () => {
     await delay(150);
     return MOCK_CITIES;
+  },
+
+  getSavedDestinations: async () => {
+    await delay(150);
+    return getStoredSavedDestinations();
+  },
+
+  toggleSaveDestination: async (city) => {
+    await delay(150);
+    const savedList = getStoredSavedDestinations();
+    const existingIndex = savedList.findIndex(s => String(s.cityId) === String(city.id));
+    
+    let saved = false;
+    if (existingIndex >= 0) {
+      savedList.splice(existingIndex, 1);
+    } else {
+      savedList.push({
+        id: 'save_' + Date.now(),
+        cityId: String(city.id),
+        cityName: city.name,
+        country: city.country,
+        imageUrl: city.image_url,
+        savedAt: new Date().toISOString()
+      });
+      saved = true;
+    }
+    
+    saveStoredSavedDestinations(savedList);
+    return { saved, list: savedList };
   },
 
   // ==========================================
