@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users, Edit3, Trash2, ArrowRight } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
 export const TripCard = ({ trip, onEdit, onDelete }) => {
+  const navigate = useNavigate();
+
   const {
     id,
     title,
@@ -29,8 +31,16 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
 
   const spentPercent = Math.min(100, Math.round(((budgetSpent || 0) / (budgetTotal || 1)) * 100));
 
+  const handleCardClick = () => {
+    navigate(`/trips/${id}`);
+  };
+
   return (
-    <Card hoverEffect className="overflow-hidden flex flex-col h-full group relative border border-slate-200/80 shadow-subtle hover:shadow-card transition-all duration-300">
+    <Card
+      hoverEffect
+      onClick={handleCardClick}
+      className="overflow-hidden flex flex-col h-full group relative border border-slate-200/80 shadow-subtle hover:shadow-card transition-all duration-300 cursor-pointer"
+    >
       {/* Cover Image Container */}
       <div className="relative h-48 w-full overflow-hidden bg-slate-900">
         <img
@@ -51,7 +61,7 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
             {status}
           </Badge>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             {onEdit && (
               <button
                 onClick={(e) => {
@@ -138,19 +148,18 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
 
         {/* Action Button Links */}
         <div className="pt-2 flex items-center gap-2">
-          <Link
-            to={`/trips/${id}`}
-            className="flex-1"
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full justify-between hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 transition-colors"
+            rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardClick();
+            }}
           >
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-full justify-between hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 transition-colors"
-              rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-            >
-              Open Itinerary
-            </Button>
-          </Link>
+            Open Itinerary
+          </Button>
         </div>
       </div>
     </Card>

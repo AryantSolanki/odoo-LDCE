@@ -289,13 +289,6 @@ export const TripsPage = () => {
               onChange={(e) => setEditForm({ ...editForm, budgetTotal: e.target.value })}
               leftIcon={<DollarSign className="w-4 h-4 text-emerald-600" />}
             />
-
-            <Input
-              label="Cover Image URL"
-              value={editForm.coverImage}
-              onChange={(e) => setEditForm({ ...editForm, coverImage: e.target.value })}
-              leftIcon={<ImageIcon className="w-4 h-4 text-slate-400" />}
-            />
           </form>
         )}
       </Modal>
