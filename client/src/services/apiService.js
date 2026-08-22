@@ -307,11 +307,29 @@ export const apiService = {
     await delay(300);
     const user = apiService.getCurrentUser();
     const trips = getStoredTrips();
+    
+    let totalAllocated = 0;
+    let totalSpent = 0;
+    trips.forEach(t => {
+      totalAllocated += (t.budgetTotal || 0);
+      totalSpent += (t.budgetSpent || 0);
+    });
+
+    const budgetSummary = {
+      totalAllocated: totalAllocated || 5000,
+      totalSpent: totalSpent || 0,
+      categories: [
+        { name: 'Flights & Transport', amount: totalSpent * 0.4, percentage: 40, color: '#3b82f6' },
+        { name: 'Accommodation', amount: totalSpent * 0.35, percentage: 35, color: '#10b981' },
+        { name: 'Activities & Dining', amount: totalSpent * 0.25, percentage: 25, color: '#f59e0b' }
+      ]
+    };
+
     return {
       user,
       trips,
       recommendedDestinations: MOCK_RECOMMENDED_DESTINATIONS,
-      budgetSummary: MOCK_BUDGET_SUMMARY,
+      budgetSummary,
       recentActivities: MOCK_ACTIVITIES,
     };
   },
@@ -610,4 +628,70 @@ export const apiService = {
     await delay(150);
     return MOCK_CITIES;
   },
+
+  // ==========================================
+  // Search & Explore Services
+  // ==========================================
+  searchCities: async (params = {}) => {
+    try {
+      const url = new URL(`${API_BASE_URL}/cities`);
+      if (params.q) url.searchParams.append('q', params.q);
+      
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error('Failed to fetch cities');
+      let cities = await res.json();
+
+      // Apply frontend filters since backend only supports q and country
+      if (params.region && params.region !== 'all') {
+        // Mock region filtering since country/region mapping isn't exact
+        // Assuming region corresponds loosely to countries for this demo
+      }
+
+      if (params.costIndex && params.costIndex !== 'all') {
+        cities = cities.filter(c => {
+          if (params.costIndex === 'Budget') return c.avg_daily_cost <= 75;
+          if (params.costIndex === 'Moderate') return c.avg_daily_cost > 75 && c.avg_daily_cost <= 150;
+          if (params.costIndex === 'Luxury') return c.avg_daily_cost > 150;
+          return true;
+        });
+      }
+
+      if (params.sortBy) {
+        if (params.sortBy === 'cost_asc') cities.sort((a, b) => a.avg_daily_cost - b.avg_daily_cost);
+        if (params.sortBy === 'cost_desc') cities.sort((a, b) => b.avg_daily_cost - a.avg_daily_cost);
+        if (params.sortBy === 'rating') cities.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      }
+
+      return cities;
+    } catch (err) {
+      console.error('searchCities error:', err);
+      throw err;
+    }
+  },
+
+  searchActivities: async (params = {}) => {
+    try {
+      const url = new URL(`${API_BASE_URL}/activities`);
+      if (params.q) url.searchParams.append('q', params.q);
+      
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error('Failed to fetch activities');
+      let acts = await res.json();
+
+      if (params.category && params.category !== 'all') {
+        acts = acts.filter(a => a.category === params.category);
+      }
+      if (params.maxCost !== null && params.maxCost !== undefined) {
+        acts = acts.filter(a => a.cost <= params.maxCost);
+      }
+      if (params.maxDuration !== null && params.maxDuration !== undefined) {
+        acts = acts.filter(a => a.duration_hours <= params.maxDuration);
+      }
+
+      return acts;
+    } catch (err) {
+      console.error('searchActivities error:', err);
+      throw err;
+    }
+  }
 };

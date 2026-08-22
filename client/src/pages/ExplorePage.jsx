@@ -31,6 +31,7 @@ export const ExplorePage = () => {
   const [activeTab, setActiveTab] = useState('cities');
   const [cities, setCities] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
   const [costIndexFilter, setCostIndexFilter] = useState('all');
@@ -140,6 +141,12 @@ export const ExplorePage = () => {
     setIsAddCityOpen(true);
   };
 
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setSearchQuery(searchInput);
+    }
+  };
+
   return (
     <AppShell>
       <div className="space-y-12 pb-24 -mt-6 sm:-mt-8">
@@ -210,8 +217,9 @@ export const ExplorePage = () => {
                   <Input
                     type="search"
                     placeholder="Search by name..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
                     leftIcon={<Search className="w-4 h-4 text-brand-400" />}
                   />
                 </div>
@@ -259,8 +267,9 @@ export const ExplorePage = () => {
                   <Input
                     type="search"
                     placeholder="Search activity..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
                     leftIcon={<Search className="w-4 h-4 text-brand-400" />}
                   />
                 </div>

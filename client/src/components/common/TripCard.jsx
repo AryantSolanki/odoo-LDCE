@@ -4,6 +4,7 @@ import { Calendar, MapPin, Users, Edit3, Trash2, ArrowRight } from 'lucide-react
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { getOptimizedImage } from '../../utils/imageResolver';
 
 export const TripCard = ({ trip, onEdit, onDelete }) => {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
     id,
     title,
     subtitle,
-    coverImage,
     startDate,
     endDate,
     status,
@@ -22,6 +22,8 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
     budgetSpent,
     collaboratorsCount = 1,
   } = trip;
+
+  const displayImage = getOptimizedImage(trip, 'trip');
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -44,11 +46,11 @@ export const TripCard = ({ trip, onEdit, onDelete }) => {
       {/* Cover Image Container */}
       <div className="relative h-56 w-full overflow-hidden bg-brand-950">
         <img
-          src={coverImage}
+          src={displayImage}
           alt={title}
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+            e.target.src = 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80';
           }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90"
           loading="lazy"

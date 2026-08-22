@@ -166,7 +166,7 @@ export const DashboardPage = () => {
             />
             <MetricCard
               title="Allocated Budget"
-              value={`$${(data?.budgetSummary?.totalAllocated || 11000).toLocaleString()}`}
+              value={`$${(data?.budgetSummary?.totalAllocated || 0).toLocaleString()}`}
               subtitle="Across all active itineraries"
               icon={DollarSign}
               trend="98% On Track"
@@ -216,7 +216,7 @@ export const DashboardPage = () => {
 
             {/* Budget Breakdown Widget */}
             <div className="xl:col-span-1">
-              <div className="bg-surface-card rounded-[2rem] border border-surface-border p-8 shadow-subtle space-y-8 h-full flex flex-col">
+              <div className="bg-surface-card rounded-[2rem] border border-surface-border p-8 shadow-subtle space-y-8 flex flex-col sticky top-8">
                 <div>
                   <h3 className="text-2xl font-editorial font-bold text-brand-900 tracking-tight flex items-center gap-3">
                     <TrendingUp className="w-6 h-6 text-brand-500" />
@@ -230,12 +230,12 @@ export const DashboardPage = () => {
                 <div className="flex items-center gap-6 pb-6 border-b border-surface-border">
                   <div>
                     <span className="text-brand-400 text-sm font-semibold uppercase tracking-wider block mb-1">Total Spent</span>
-                    <span className="text-2xl font-bold text-brand-900">${(data?.budgetSummary?.totalSpent || 8850).toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-brand-900">${(data?.budgetSummary?.totalSpent || 0).toLocaleString()}</span>
                   </div>
                   <div className="w-px h-12 bg-surface-border" />
                   <div>
                     <span className="text-brand-400 text-sm font-semibold uppercase tracking-wider block mb-1">Buffer</span>
-                    <span className="text-2xl font-bold text-green-600">${((data?.budgetSummary?.totalAllocated || 11000) - (data?.budgetSummary?.totalSpent || 8850)).toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-green-600">${Math.max(0, (data?.budgetSummary?.totalAllocated || 0) - (data?.budgetSummary?.totalSpent || 0)).toLocaleString()}</span>
                   </div>
                 </div>
 
